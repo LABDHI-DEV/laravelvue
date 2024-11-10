@@ -1,66 +1,139 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+composer create-project --prefer-dist laravel/laravel laravelvue "11.*"
+remove vite from package.json
+npm install vue vue-loader vue-template-compiler
+npm install laravel-mix
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+add script in package.json
+"scripts": {
+    "dev": "mix",
+    "watch": "mix watch",
+    "prod": "mix --production"
+}
 
-## About Laravel
+composer require laravel/ui
+php artisan ui vue
+php artisan ui vue --auth
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+replace code in resources/js/app.js
+import { createApp } from 'vue';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-## Learning Laravel
+import ExampleComponent from './components/ExampleComponent.vue';
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+const app = createApp({});
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+app.component('example-component', ExampleComponent);
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+app.mount('#app');
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+create webpack.mix.js file on root
+add code
+const mix = require('laravel-mix');
 
-### Premium Partners
+mix.js('resources/js/app.js', 'public/assets/js')
+   .vue() // Enables Vue support
+   .sass('resources/sass/app.scss', 'public/assets/css');
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+npm install bootstrap@5.3.0
+add resources/js/app.js
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-## Contributing
+Remove resources/sass/app.scss
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+app.blade.php
+remove vite code and add 
+<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
+<script src="{{ asset('assets/js/app.js') }}"></script>
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+delete post.config.js
 
-## Security Vulnerabilities
+routes setup and dashboard =>
+1 . routes file = 
+<?php
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+use Illuminate\Support\Facades\Route;
 
-## License
+Route::get('/dashboard/{any?}', function () {
+    return view('dashboard'); // Ensure 'dashboard.blade.php' exists
+})->where('any', '.*');
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Route::get('/', function () {
+    return redirect('login');
+});
+
+Auth::routes();
+register false
+
+2. login controller changes => redirect to  dashboard page
+3. create dashboard.blade.php file => 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="{{ asset('assets/css/app.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app">
+        <example-component></example-component>
+    </div>
+
+    <script src="{{ asset('assets/js/app.js') }}"></script>
+</body>
+
+</html>
+
+4. app.js file add 
+const app = createApp({
+    components: {
+        ExampleComponent,
+    }
+});
+
+
+
+
+
+
+
+
+Delete vite.config.js if it exists.
+Delete node_modules/vite if it's present in your node_modules directory.
+Remove the vite dependency from your package.json file.
+npm uninstall vite
+
+
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">{{ __('Dashboard') }}</div>
+
+                <div class="card-body">
+                    @if (session('status'))
+                        <div class="alert alert-success" role="alert">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    {{ __('You are logged in!') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
